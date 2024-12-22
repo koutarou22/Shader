@@ -16,10 +16,9 @@ class Texture;
 
 enum SHADER_TYPE_SELECT
 {
+	SHADER_TYPE_3D = 0, 
 	SHADER_TYPE_POINT,
-	SHADER_TYPE_3D,
 };
-
 
 class Fbx
 {

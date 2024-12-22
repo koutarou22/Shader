@@ -10,7 +10,7 @@
 #include "Debug.h"
 Fbx::Fbx()
 	:vertexCount_(0), polygonCount_(0), materialCount_(0),
-	pVertexBuffer_(nullptr), pIndexBuffer_(nullptr), pConstantBuffer_(nullptr)
+	pVertexBuffer_(nullptr), pIndexBuffer_(nullptr), pConstantBuffer_(nullptr), NextShader_(SHADER_TYPE_3D)
 {
 }
 
@@ -295,7 +295,7 @@ void Fbx::Draw(Transform& transform)
 		{
 			SetShaderState(SHADER_TYPE_POINT);
 		}
-		if (NextShader_ == SHADER_TYPE_POINT)
+		else
 		{
 			SetShaderState(SHADER_TYPE_3D);
 		}
@@ -304,18 +304,11 @@ void Fbx::Draw(Transform& transform)
 	//// シェーダーの切り替え
 	switch (NextShader_)
 	{
-	case SHADER_TYPE_3D:
-
+	case 0:
 		Direct3D::SetShader(SHADER_3D);
 		break;
-
-	case SHADER_TYPE_POINT:
-	
+	case 1:
 		Direct3D::SetShader(SHADER_POINT);
-		break;
-
-	default:
-		Debug::Log("シェーダーが設定されていません", true);
 		break;
 	}
 
