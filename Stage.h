@@ -20,7 +20,6 @@ class Stage : public GameObject
     int hRing_PhongCollar_;
     int hRing_Lambert;
     ID3D11Buffer* pConstantBuffer_;
-    Fbx pfbx;
 
     void InitConstantBuffer();
 

@@ -75,5 +75,5 @@ public:
 	void    Update();
 	void    Release();
 	SHADER_TYPE_SELECT NextShader_;
-	void SetShaderState(SHADER_TYPE_SELECT shaderState) { shaderState = NextShader_; }
+	void SetShaderState(SHADER_TYPE_SELECT shaderState) { NextShader_ = shaderState; }
 };

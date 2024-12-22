@@ -101,18 +101,6 @@ void Stage::Update()
         Direct3D::SetLightPos(p);
     }
 
-    // シェーダーの直接設定
-    //if (Input::IsKey(DIK_2))
-    //{
-    //    Debug::Log("キーが押され点光源シェーダーが設定されるはず", true);
-    //    pfbx.SetShaderState(2);
-    //}
-    //if (Input::IsKey(DIK_1))
-    //{
-    //    Debug::Log("キーが押され平行光源シェーダーが設定されるはず", true);
-    //    pfbx.SetShaderState(1);
-    //}
-
     // コンスタントバッファの設定と、シェーダーへのコンスタントバッファのセット
     CONSTANT_BUFFER_STAGE cb;
     cb.lightPosition = Direct3D::GetLightPos();
@@ -131,7 +119,6 @@ void Stage::Update()
 
 void Stage::Draw()
 {
-   // pfbx.Draw(transform_);
     Transform ltr;
     ltr.position_ = { Direct3D::GetLightPos().x,Direct3D::GetLightPos().y,Direct3D::GetLightPos().z };
     ltr.scale_ = { 0.1,0.1,0.1 };
@@ -150,28 +137,28 @@ void Stage::Draw()
     static Transform Ring;
     Ring.scale_ = { 0.35,0.35,0.35 };
     Ring.position_ = { 0,0.5,0 };
-    Ring.rotate_.y += 0.3;
+    //Ring.rotate_.y += 0.3;
     Model::SetTransform(hRing_, Ring);
     Model::Draw(hRing_);
 
     //テクスチャなし、フォンあり、いろあり
     Ring.scale_ = { 0.35,0.35,0.35 };
     Ring.position_ = { 0.7,0.5,0 };
-    Ring.rotate_.y += 0.3;
+    //Ring.rotate_.y += 0.3;
     Model::SetTransform(hRing_PhongCollar_, Ring);
     Model::Draw(hRing_PhongCollar_);
 
     //ランバートのみ
     Ring.scale_ = { 0.35,0.35,0.35 };
     Ring.position_ = { -0.7,0.5,0 };
-    Ring.rotate_.y += 0.3;
+    //Ring.rotate_.y += 0.3;
     Model::SetTransform(hRing_Lambert, Ring);
     Model::Draw(hRing_Lambert);
 
     //ランバートあり、テクスチャあり
     Ring.scale_ = { 0.35,0.35,0.35 };
     Ring.position_ = { -0.7,1.2,0 };
-    Ring.rotate_.y += 0.3;
+    //Ring.rotate_.y += 0.3;
     Model::SetTransform(hRing_LambertTexture_, Ring);
     Model::Draw(hRing_LambertTexture_);
 

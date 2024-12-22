@@ -289,7 +289,7 @@ void Fbx::Update()
 void Fbx::Draw(Transform& transform)
 {
 
-	if (Input::IsKey(DIK_P))
+	if (Input::IsKeyDown(DIK_P))
 	{
 		if (NextShader_ == SHADER_TYPE_3D)
 		{
@@ -300,8 +300,7 @@ void Fbx::Draw(Transform& transform)
 			SetShaderState(SHADER_TYPE_3D);
 		}
 	}
-	//Debug::Log("ShaderState_の値: " + std::to_string(ShaderState_), true);
-	//// シェーダーの切り替え
+
 	switch (NextShader_)
 	{
 	case 0:
