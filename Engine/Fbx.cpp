@@ -7,9 +7,10 @@
 #include <filesystem>
 #include "Input.h"
 
+#include "Debug.h"
 Fbx::Fbx()
 	:vertexCount_(0), polygonCount_(0), materialCount_(0),
-	pVertexBuffer_(nullptr), pIndexBuffer_(nullptr), pConstantBuffer_(nullptr), ShaderState_(1)
+	pVertexBuffer_(nullptr), pIndexBuffer_(nullptr), pConstantBuffer_(nullptr)
 {
 }
 
@@ -280,26 +281,49 @@ void Fbx::InitMaterial(fbxsdk::FbxNode* pNode)
 	}
 }
 
+void Fbx::Update()
+{
+
+}
 
 void Fbx::Draw(Transform& transform)
 {
-	switch (ShaderState_)
+
+	if (Input::IsKey(DIK_P))
 	{
-	case SHADERTYPE::POINTLIGHT:
+		if (NextShader_ == SHADER_TYPE_3D)
+		{
+			SetShaderState(SHADER_TYPE_POINT);
+		}
+		if (NextShader_ == SHADER_TYPE_POINT)
+		{
+			SetShaderState(SHADER_TYPE_3D);
+		}
+	}
+	//Debug::Log("ShaderState_の値: " + std::to_string(ShaderState_), true);
+	//// シェーダーの切り替え
+	switch (NextShader_)
+	{
+	case SHADER_TYPE_3D:
+
 		Direct3D::SetShader(SHADER_3D);
 		break;
-	case SHADERTYPE::MATERIAL:
+
+	case SHADER_TYPE_POINT:
+	
 		Direct3D::SetShader(SHADER_POINT);
 		break;
+
 	default:
+		Debug::Log("シェーダーが設定されていません", true);
 		break;
 	}
-	
+
 	transform.Calclation();
-	
+
 	for (int i = 0; i < materialCount_; i++)
 	{
-		//コンスタントバッファに情報を渡す
+		// コンスタントバッファに情報を渡す
 		CONSTBUFFER_MODEL cb;
 		cb.matWVP = XMMatrixTranspose(transform.GetWorldMatrix() * Camera::GetViewMatrix() * Camera::GetProjectionMatrix());
 		cb.matW = XMMatrixTranspose(transform.GetWorldMatrix());
@@ -311,43 +335,38 @@ void Fbx::Draw(Transform& transform)
 		cb.shininess = pMaterialList_[i].shininess;
 		cb.isTextured = pMaterialList_[i].pTexture != nullptr;
 		D3D11_MAPPED_SUBRESOURCE pdata;
-		Direct3D::pContext_->Map(pConstantBuffer_, 0, D3D11_MAP_WRITE_DISCARD, 0, &pdata);	// GPUからのデータアクセスを止める
-		memcpy_s(pdata.pData, pdata.RowPitch, (void*)(&cb), sizeof(cb));	// データを値を送る
+		Direct3D::pContext_->Map(pConstantBuffer_, 0, D3D11_MAP_WRITE_DISCARD, 0, &pdata); // GPUからのデータアクセスを止める
+		memcpy_s(pdata.pData, pdata.RowPitch, (void*)(&cb), sizeof(cb)); // データを値を送る
 
-		Direct3D::pContext_->Unmap(pConstantBuffer_, 0);	//再開
+		Direct3D::pContext_->Unmap(pConstantBuffer_, 0); // 再開
 
-		//頂点バッファ、インデックスバッファ、コンスタントバッファをパイプラインにセット
-		//頂点バッファ
+		// 頂点バッファ、インデックスバッファ、コンスタントバッファをパイプラインにセット
 		UINT stride = sizeof(VERTEX);
 		UINT offset = 0;
 		Direct3D::pContext_->IASetVertexBuffers(0, 1, &pVertexBuffer_, &stride, &offset);
-
-
-		// インデックスバッファーをセット
-		stride = sizeof(int);
-		offset = 0;
 		Direct3D::pContext_->IASetIndexBuffer(pIndexBuffer_[i], DXGI_FORMAT_R32_UINT, 0);
-
-		//コンスタントバッファ
-		Direct3D::pContext_->VSSetConstantBuffers(0, 1, &pConstantBuffer_);	//頂点シェーダー用	
-		Direct3D::pContext_->PSSetConstantBuffers(0, 1, &pConstantBuffer_);	//ピクセルシェーダー用
-
+		Direct3D::pContext_->VSSetConstantBuffers(0, 1, &pConstantBuffer_); // 頂点シェーダー用
+		Direct3D::pContext_->PSSetConstantBuffers(0, 1, &pConstantBuffer_); // ピクセルシェーダー用
 
 		if (pMaterialList_[i].pTexture)
 		{
 			ID3D11SamplerState* pSampler = pMaterialList_[i].pTexture->GetSampler();
 			Direct3D::pContext_->PSSetSamplers(0, 1, &pSampler);
-
 			ID3D11ShaderResourceView* pSRV = pMaterialList_[i].pTexture->GetSRV();
 			Direct3D::pContext_->PSSetShaderResources(0, 1, &pSRV);
 		}
 
-		//描画
+		// 描画
 		Direct3D::pContext_->DrawIndexed(indexCount_[i], 0, 0);
 	}
 }
 
+
+
 void Fbx::Release()
 {
 }
+
+
+
 

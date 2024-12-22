@@ -14,7 +14,7 @@ using namespace DirectX;
 
 enum SHADER_TYPE
 {
-	SHADER_2D,
+	SHADER_2D = 0,
 	SHADER_3D,
 	SHADER_POINT,
 	SHADER_MAX

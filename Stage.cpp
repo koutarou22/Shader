@@ -3,6 +3,7 @@
 #include "Engine/Input.h"
 #include "Engine/Camera.h"
 #include "Engine/Fbx.h"
+#include "Engine/Debug.h"
 
 
 void Stage::InitConstantBuffer()
@@ -58,64 +59,79 @@ void Stage::Initialize()
 
 void Stage::Update()
 {
-
-    Fbx* pFbx = nullptr;
     transform_.rotate_.y += 0.5f;
+
+    // ライトの位置を調整
     if (Input::IsKey(DIK_A))
     {
         XMFLOAT4 p = Direct3D::GetLightPos();
-        p = { p.x - 0.01f,p.y, p.z,p.w };
+        p = { p.x - 0.01f, p.y, p.z, p.w };
         Direct3D::SetLightPos(p);
     }
     if (Input::IsKey(DIK_D))
     {
         XMFLOAT4 p = Direct3D::GetLightPos();
-        p = { p.x + 0.01f,p.y, p.z,p.w };
+        p = { p.x + 0.01f, p.y, p.z, p.w };
         Direct3D::SetLightPos(p);
     }
     if (Input::IsKey(DIK_W))
     {
         XMFLOAT4 p = Direct3D::GetLightPos();
-        p = { p.x,p.y, p.z + 0.01f,p.w };
+        p = { p.x, p.y, p.z + 0.01f, p.w };
         Direct3D::SetLightPos(p);
     }
     if (Input::IsKey(DIK_S))
     {
         XMFLOAT4 p = Direct3D::GetLightPos();
-        p = { p.x ,p.y, p.z - 0.01f,p.w };
+        p = { p.x, p.y, p.z - 0.01f, p.w };
         Direct3D::SetLightPos(p);
     }
     if (Input::IsKey(DIK_UP))
     {
+        Debug::Log("↑", true);
         XMFLOAT4 p = Direct3D::GetLightPos();
-        p = { p.x,p.y + 0.01f, p.z,p.w };
+        p = { p.x, p.y + 0.01f, p.z, p.w };
         Direct3D::SetLightPos(p);
     }
     if (Input::IsKey(DIK_DOWN))
     {
+        Debug::Log("↓", true);
         XMFLOAT4 p = Direct3D::GetLightPos();
-        p = { p.x ,p.y - 0.01f, p.z,p.w };
+        p = { p.x, p.y - 0.01f, p.z, p.w };
         Direct3D::SetLightPos(p);
     }
 
-    //コンスタントバッファの設定と、シェーダーへのコンスタントバッファのセットを書くよ
+    // シェーダーの直接設定
+    //if (Input::IsKey(DIK_2))
+    //{
+    //    Debug::Log("キーが押され点光源シェーダーが設定されるはず", true);
+    //    pfbx.SetShaderState(2);
+    //}
+    //if (Input::IsKey(DIK_1))
+    //{
+    //    Debug::Log("キーが押され平行光源シェーダーが設定されるはず", true);
+    //    pfbx.SetShaderState(1);
+    //}
+
+    // コンスタントバッファの設定と、シェーダーへのコンスタントバッファのセット
     CONSTANT_BUFFER_STAGE cb;
     cb.lightPosition = Direct3D::GetLightPos();
     XMStoreFloat4(&cb.eyePosition, Camera::GetPosition());
 
     D3D11_MAPPED_SUBRESOURCE pdata;
-    Direct3D::pContext_->Map(pConstantBuffer_, 0, D3D11_MAP_WRITE_DISCARD, 0, &pdata);	// GPUからのデータアクセスを止める
-    memcpy_s(pdata.pData, pdata.RowPitch, (void*)(&cb), sizeof(cb));	// データを値を送る
-    Direct3D::pContext_->Unmap(pConstantBuffer_, 0);	//再開
+    Direct3D::pContext_->Map(pConstantBuffer_, 0, D3D11_MAP_WRITE_DISCARD, 0, &pdata); // GPUからのデータアクセスを止める
+    memcpy_s(pdata.pData, pdata.RowPitch, (void*)(&cb), sizeof(cb)); // データを値を送る
+    Direct3D::pContext_->Unmap(pConstantBuffer_, 0); // 再開
 
-    //コンスタントバッファ
-    Direct3D::pContext_->VSSetConstantBuffers(1, 1, &pConstantBuffer_);	//頂点シェーダー用	
-    Direct3D::pContext_->PSSetConstantBuffers(1, 1, &pConstantBuffer_);	//ピクセルシェーダー用
+    // コンスタントバッファの設定
+    Direct3D::pContext_->VSSetConstantBuffers(1, 1, &pConstantBuffer_); // 頂点シェーダー用
+    Direct3D::pContext_->PSSetConstantBuffers(1, 1, &pConstantBuffer_); // ピクセルシェーダー用
 }
+
 
 void Stage::Draw()
 {
-
+   // pfbx.Draw(transform_);
     Transform ltr;
     ltr.position_ = { Direct3D::GetLightPos().x,Direct3D::GetLightPos().y,Direct3D::GetLightPos().z };
     ltr.scale_ = { 0.1,0.1,0.1 };

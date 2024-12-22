@@ -3,6 +3,7 @@
 #include <DirectXMath.h>
 #include <cassert>
 #include <vector>
+#include "Debug.h"
 
 
 
@@ -153,26 +154,24 @@ HRESULT Direct3D::Initialize(int winW, int winH, HWND hWnd)
 //シェーダー準備
 HRESULT Direct3D::InitShader()
 {
-
 	if (FAILED(InitShader3D()))
 	{
+		MessageBox(NULL, "3Dシェーダーの初期化に失敗しました", "エラー", MB_OK);
 		return E_FAIL;
 	}
-
 	if (FAILED(InitShader2D()))
 	{
+		MessageBox(NULL, "2Dシェーダーの初期化に失敗しました", "エラー", MB_OK);
 		return E_FAIL;
 	}
-
 	if (FAILED(InitPointLightShader()))
 	{
+		MessageBox(NULL, "点光源シェーダーの初期化に失敗しました", "エラー", MB_OK);
 		return E_FAIL;
 	}
-
 	return S_OK;
-
-
 }
+
 
 HRESULT Direct3D::InitShader3D()
 {
@@ -386,12 +385,13 @@ HRESULT Direct3D::InitPointLightShader()
 
 void Direct3D::SetShader(SHADER_TYPE type)
 {
-	//それぞれをデバイスコンテキストにセット
-	pContext_->VSSetShader(shaderBundle[type].pVertexShader_, NULL, 0);	//頂点シェーダー
-	pContext_->PSSetShader(shaderBundle[type].pPixelShader_, NULL, 0);	//ピクセルシェーダー
-	pContext_->IASetInputLayout(shaderBundle[type].pVertexLayout_);	//頂点インプットレイアウト
-	pContext_->RSSetState(shaderBundle[type].pRasterizerState_);		//ラスタライザー
+	pContext_->VSSetShader(shaderBundle[type].pVertexShader_, NULL, 0);
+	pContext_->PSSetShader(shaderBundle[type].pPixelShader_, NULL, 0);
+	pContext_->IASetInputLayout(shaderBundle[type].pVertexLayout_);
+	pContext_->RSSetState(shaderBundle[type].pRasterizerState_);
+	Debug::Log("シェーダーセット完了: " + std::to_string(type), true);
 }
+
 
 //描画開始
 void Direct3D::BeginDraw()

@@ -6,7 +6,6 @@
 #include "Transform.h"
 #include <vector>
 
-
 #pragma comment(lib, "LibFbxSDK-MD.lib")
 #pragma comment(lib, "LibXml2-MD.lib")
 #pragma comment(lib, "zlib-MD.lib")
@@ -15,16 +14,15 @@ using std::vector;
 
 class Texture;
 
-enum SHADERTYPE
+enum SHADER_TYPE_SELECT
 {
-	POINTLIGHT = 1,
-	MATERIAL,
+	SHADER_TYPE_POINT,
+	SHADER_TYPE_3D,
 };
 
 
 class Fbx
 {
-	int ShaderState_;
 	//ƒ}ƒeƒŠƒAƒ‹
 	struct MATERIAL
 	{
@@ -75,5 +73,8 @@ public:
 	Fbx();
 	HRESULT Load(std::string fileName);
 	void    Draw(Transform& transform);
+	void    Update();
 	void    Release();
+	SHADER_TYPE_SELECT NextShader_;
+	void SetShaderState(SHADER_TYPE_SELECT shaderState) { shaderState = NextShader_; }
 };
